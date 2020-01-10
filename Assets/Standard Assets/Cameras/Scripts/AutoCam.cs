@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityStandardAssets._2D;
 #if UNITY_EDITOR
 
 #endif
@@ -9,6 +10,9 @@ namespace UnityStandardAssets.Cameras
     [ExecuteInEditMode]
     public class AutoCam : PivotBasedCameraRig
     {
+        [SerializeField] private Rigidbody2D player;
+        [SerializeField] private Platformer2DUserControl platformChar2dcontrol;
+        [SerializeField] private bool isRunning = false;
         [SerializeField] private float m_MoveSpeed = 3; // How fast the rig will move to keep up with target's position
         [SerializeField] private float m_TurnSpeed = 1; // How fast the rig will turn to keep up with target's rotation
         [SerializeField] private float m_RollSpeed = 0.2f;// How fast the rig will roll (around Z axis) to match target's roll.
@@ -17,13 +21,17 @@ namespace UnityStandardAssets.Cameras
         [SerializeField] private float m_SpinTurnLimit = 90;// The threshold beyond which the camera stops following the target's rotation. (used in situations where a car spins out, for example)
         [SerializeField] private float m_TargetVelocityLowerLimit = 4f;// the minimum velocity above which the camera turns towards the object's velocity. Below this we use the object's forward direction.
         [SerializeField] private float m_SmoothTurnTime = 0.2f; // the smoothing for the camera's rotation
+        [SerializeField] private float m_RunCamZoomOut = 13f;
 
         private float m_LastFlatAngle; // The relative angle of the target and the rig from the previous frame.
         private float m_CurrentTurnAmount; // How much to turn the camera
         private float m_TurnSpeedVelocityChange; // The change in the turn speed velocity
         private Vector3 m_RollUp = Vector3.up;// The roll of the camera around the z axis ( generally this will always just be up )
 
-
+        private void Update()
+        {
+            isRunning = platformChar2dcontrol.run;
+        }
         protected override void FollowTarget(float deltaTime)
         {
             // if no target, or no time passed then we quit early, as there is nothing to do
@@ -85,7 +93,17 @@ namespace UnityStandardAssets.Cameras
             }
 
             // camera position moves towards target position:
-            transform.position = Vector3.Lerp(transform.position, m_Target.position, deltaTime*m_MoveSpeed);
+            Debug.Log("velocity.magnitude  = " + player.velocity.magnitude);
+            if(player.velocity.magnitude >= 4f & isRunning)
+            {
+                m_RunCamZoomOut = 10f;
+            }
+            if(player.velocity.magnitude < 15f && !isRunning)
+            {
+                m_RunCamZoomOut = 0f;
+            }
+            transform.position = Vector3.Lerp(transform.position, new Vector3(m_Target.position.x, m_Target.position.y, m_Target.position.z - m_RunCamZoomOut), deltaTime * m_MoveSpeed);
+
 
             // camera's rotation is split into two parts, which can have independend speed settings:
             // rotating towards the target's forward direction (which encompasses its 'yaw' and 'pitch')
