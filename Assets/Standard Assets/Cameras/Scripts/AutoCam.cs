@@ -93,7 +93,7 @@ namespace UnityStandardAssets.Cameras
             }
 
             // camera position moves towards target position:
-            Debug.Log("velocity.magnitude  = " + player.velocity.magnitude);
+            //Debug.Log("velocity.magnitude  = " + player.velocity.magnitude);
             if(player.velocity.magnitude >= 4f & isRunning)
             {
                 m_RunCamZoomOut = 10f;

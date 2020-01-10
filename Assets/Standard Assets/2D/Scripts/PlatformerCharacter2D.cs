@@ -11,6 +11,7 @@ namespace UnityStandardAssets._2D
         [Range(0, 1)] [SerializeField] private float m_CrouchSpeed = .36f;  // Amount of maxSpeed applied to crouching movement. 1 = 100%
         [SerializeField] private bool m_AirControl = false;                 // Whether or not a player can steer while jumping;
         [SerializeField] private LayerMask m_WhatIsGround;                  // A mask determining what is ground to the character
+        [SerializeField] private float gravityScale = 1f;
 
         private Transform m_GroundCheck;    // A position marking where to check if the player is grounded.
         const float k_GroundedRadius = .2f; // Radius of the overlap circle to determine if grounded
@@ -52,6 +53,7 @@ namespace UnityStandardAssets._2D
 
         public void Move(float move, bool crouch, bool jump, bool m_RunEnabled)
         {
+            Debug.Log("gravit scale is " + m_Rigidbody2D.gravityScale);
             // If crouching, check to see if the character can stand up
             if (!crouch && m_Anim.GetBool("Crouch"))
             {
@@ -78,10 +80,12 @@ namespace UnityStandardAssets._2D
                 if (m_RunEnabled)
                 {
                     m_Rigidbody2D.velocity = new Vector2(move * m_MaxWalkSpeed * m_RunMultiplyer, m_Rigidbody2D.velocity.y);
+                    m_Rigidbody2D.gravityScale = gravityScale;
                 }
                 if (!m_RunEnabled)
                 {
                     m_Rigidbody2D.velocity = new Vector2(move * m_MaxWalkSpeed, m_Rigidbody2D.velocity.y);
+                    m_Rigidbody2D.gravityScale = 3f;
                 }
 
 
